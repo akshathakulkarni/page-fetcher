@@ -12,13 +12,15 @@ const fethcer = (URL,saveTo) => {
       console.log(`Status Code ${response.statusCode} when fetching ${URL} Response: ${body}`);
       return;
     }
-    if (isValid(saveTo)) { //Check if the file path is valid 
-      fs.writeFile(saveTo, body, function(err) {
-        if(err) {
-            return console.log(err);
-        }
-        console.log(`Downloaded and saved ${body.length} bytes to ${saveTo}file`);
-      }); 
+    if (isValid(saveTo)) { 
+      if (fs.existsSync(saveTo)) { 
+        fs.writeFile(saveTo, body, function(err) {
+          if(err) {
+              return console.log(err);
+          }
+          console.log(`Downloaded and saved ${body.length} bytes to ${saveTo}file`);
+        }); 
+      }
     } else {
       console.log('Failed to write! Given file path is invalid.');
     }
