@@ -2,6 +2,15 @@ const request = require('request');
 const fs = require('fs');
 const isValid = require('is-valid-path');
 
+const writeToFile = (saveTo, body) => {
+  fs.writeFile(saveTo, body, function(err) {
+    if(err) {
+        return console.log(err);
+    }
+    console.log(`Downloaded and saved ${body.length} bytes to ${saveTo}file`);
+  }); 
+}
+
 const fethcer = (URL,saveTo) => {
   request(URL, (error, response, body) => {
     if (error) {
@@ -14,12 +23,18 @@ const fethcer = (URL,saveTo) => {
     }
     if (isValid(saveTo)) { 
       if (fs.existsSync(saveTo)) { 
-        fs.writeFile(saveTo, body, function(err) {
-          if(err) {
-              return console.log(err);
+        const readline = require('readline').createInterface({
+          input: process.stdin,
+          output: process.stdout
+        });
+        readline.question('The file already exists. Overwrite? Y/N: ', key => {
+          if (key === 'Y') {
+            writeToFile(saveTo, body);
           }
-          console.log(`Downloaded and saved ${body.length} bytes to ${saveTo}file`);
-        }); 
+          readline.close();
+        });   
+      } else {
+        writeToFile(saveTo, body);
       }
     } else {
       console.log('Failed to write! Given file path is invalid.');
